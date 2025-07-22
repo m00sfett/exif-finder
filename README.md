@@ -7,6 +7,7 @@ EXIF Finder is a command-line tool for locating JPEG images by their EXIF date. 
 - Fast scanning without decoding full image data
 - Handles Unicode paths
 - Optional output to a file
+- Multi-threaded EXIF reading using `--threads`
 - Works on Windows, macOS and Linux
 
 ## Installation
@@ -31,11 +32,18 @@ Options:
 - `--include-date`: include the matched date before each path
 - `--verbose`: print every processed file and debug info
 - `--only-folders`: output only folders of matches without duplicates
+- `--threads`: number of worker threads for reading EXIF data
 
 Example with output file:
 
 ```bash
 python -m exif_finder --path C:\Photos --date 2012-09-03 --output results.txt --include-date
+```
+
+To speed up processing using four threads:
+
+```bash
+python -m exif_finder --path /photos --date 2012-09-03 --threads 4
 ```
 
 ## License

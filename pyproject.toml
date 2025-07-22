@@ -1,6 +1,6 @@
 [project]
 name = "exif-finder"
-version = "0.0.2"
+version = "0.0.3"
 description = "Command-line tool to find JPEG images by EXIF date"
 authors = [{name = "Example", email = "example@example.com"}]
 readme = "README.md"
