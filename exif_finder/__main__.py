@@ -4,7 +4,7 @@ import argparse
 import datetime as _dt
 import os
 from pathlib import Path
-from typing import Iterable, Optional
+from typing import Iterable, Optional, Set
 
 from PIL import Image, ExifTags
 
@@ -28,6 +28,16 @@ def parse_args(argv: Optional[Iterable[str]] = None) -> argparse.Namespace:
         "--output",
         type=str,
         help="Optional file to write results (UTF-8)"
+    )
+    parser.add_argument(
+        "--verbose",
+        action="store_true",
+        help="Show every processed file and debug details",
+    )
+    parser.add_argument(
+        "--only-folders",
+        action="store_true",
+        help="Output only folders of matches without duplicates",
     )
     parser.add_argument(
         "--include-date",
@@ -74,11 +84,24 @@ def main(argv: Optional[Iterable[str]] = None) -> int:
     if args.output:
         output_path = Path(args.output)
         output_file = output_path.open("w", encoding="utf-8")
+    printed_folders: Set[str] = set()
 
     for file in iter_jpeg_files(root):
+        if args.verbose:
+            print(f"Checking {file}")
         date_text = exif_date(file)
+        if args.verbose:
+            print(f"  EXIF date: {date_text}")
         if date_text and match_date(date_text, target_date):
-            line = str(file)
+            if args.only_folders:
+                line_path = str(file.parent)
+                if line_path in printed_folders:
+                    continue
+                printed_folders.add(line_path)
+            else:
+                line_path = str(file)
+
+            line = line_path
             if args.include_date:
                 line = f"{target_date.isoformat()}: {line}"
             print(line)

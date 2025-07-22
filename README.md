@@ -29,6 +29,8 @@ Options:
 - `--date`: date in `YYYY-MM-DD` format to match
 - `--output`: write results to a UTF-8 file
 - `--include-date`: include the matched date before each path
+- `--verbose`: print every processed file and debug info
+- `--only-folders`: output only folders of matches without duplicates
 
 Example with output file:
 
