@@ -3,6 +3,7 @@ from __future__ import annotations
 import argparse
 import datetime as _dt
 import os
+from concurrent.futures import ThreadPoolExecutor
 from pathlib import Path
 from typing import Iterable, Optional, Set
 
@@ -43,6 +44,12 @@ def parse_args(argv: Optional[Iterable[str]] = None) -> argparse.Namespace:
         "--include-date",
         action="store_true",
         help="Include matched date in output",
+    )
+    parser.add_argument(
+        "--threads",
+        type=int,
+        default=1,
+        help="Number of worker threads to use when reading EXIF data",
     )
     return parser.parse_args(argv)
 
@@ -86,11 +93,13 @@ def main(argv: Optional[Iterable[str]] = None) -> int:
         output_file = output_path.open("w", encoding="utf-8")
     printed_folders: Set[str] = set()
 
-    for file in iter_jpeg_files(root):
+    files = list(iter_jpeg_files(root))
+    with ThreadPoolExecutor(max_workers=args.threads) as executor:
+        dates = list(executor.map(exif_date, files))
+
+    for file, date_text in zip(files, dates):
         if args.verbose:
             print(f"Checking {file}")
-        date_text = exif_date(file)
-        if args.verbose:
             print(f"  EXIF date: {date_text}")
         if date_text and match_date(date_text, target_date):
             if args.only_folders:
